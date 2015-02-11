@@ -16,8 +16,34 @@
  */
 package org.apache.activemq.store.kahadb;
 
-import org.apache.activemq.broker.*;
-import org.apache.activemq.command.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.transaction.xa.Xid;
+
+import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.broker.BrokerServiceAware;
+import org.apache.activemq.broker.ConnectionContext;
+import org.apache.activemq.broker.Lockable;
+import org.apache.activemq.broker.LockableServiceSupport;
+import org.apache.activemq.broker.Locker;
+import org.apache.activemq.broker.scheduler.JobSchedulerStore;
+import org.apache.activemq.command.ActiveMQDestination;
+import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.activemq.command.ActiveMQTopic;
+import org.apache.activemq.command.LocalTransactionId;
+import org.apache.activemq.command.ProducerId;
+import org.apache.activemq.command.TransactionId;
+import org.apache.activemq.command.XATransactionId;
 import org.apache.activemq.filter.AnyDestination;
 import org.apache.activemq.filter.DestinationMap;
 import org.apache.activemq.filter.DestinationMapEntry;
@@ -57,7 +83,7 @@ public class MultiKahaDBPersistenceAdapter extends LockableServiceSupport implem
     final DelegateDestinationMap destinationMap = new DelegateDestinationMap();
 
     BrokerService brokerService;
-    List<PersistenceAdapter> adapters = new LinkedList<PersistenceAdapter>();
+    List<PersistenceAdapter> adapters = new CopyOnWriteArrayList<PersistenceAdapter>();
     private File directory = new File(IOHelper.getDefaultDataDirectory() + File.separator + "mKahaDB");
 
     MultiKahaDBTransactionStore transactionStore = new MultiKahaDBTransactionStore(this);
