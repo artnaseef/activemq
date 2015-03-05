@@ -395,7 +395,7 @@ public class Queue extends BaseDestination implements Task, UsageListener {
                    listener.processExpired();
                } while (!listener.done());
             } else {
-                destinationStatistics.getMessages().setCount(messageCount);
+                destinationStatistics.getMessages().add(messageCount);
             }
         }
     }
